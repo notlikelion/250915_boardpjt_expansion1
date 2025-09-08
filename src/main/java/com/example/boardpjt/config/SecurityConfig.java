@@ -61,6 +61,9 @@ public class SecurityConfig {
                         // "/my-page" 경로는 인증된 사용자만 접근 가능
                         .requestMatchers("/my-page").authenticated()
 
+                        // ROLE_ADMIN, ROLE_USER -> (ROLE_) ...
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+
                         // 그 외 모든 요청은 인증 필요
                         .anyRequest().authenticated()
                 )
