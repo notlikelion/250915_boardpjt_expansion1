@@ -47,7 +47,7 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-
+        System.out.println("[Jwt Filter]");
         // === 1단계: 쿠키에서 JWT 토큰 추출 ===
         String token = CookieUtil.findCookie(request, "access_token");
 //        String token = null;
@@ -68,6 +68,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // === 2단계: 토큰이 없는 경우 처리 ===
         if (token == null) {
+//        if (token == null || !jwtUtil.validateToken(token)) {
             // JWT 토큰이 없는 경우 인증 없이 다음 필터로 요청 전달
             // 이 경우 SecurityConfig의 설정에 따라 접근 제한이 적용됨
             filterChain.doFilter(request, response);

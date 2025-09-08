@@ -30,7 +30,7 @@ public class RefreshJwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-
+        System.out.println("[Refresh Jwt Filter]");
         String accessToken = CookieUtil.findCookie(request, "access_token");
         if (accessToken == null) {
             filterChain.doFilter(request, response);
@@ -39,12 +39,15 @@ public class RefreshJwtFilter extends OncePerRequestFilter {
         // Refresh Token의 경우...
         try {
             // Access Token을 검증해서... (DB랑 비교해서 쿼리를 날려본게 X)
+//            jwtUtil.getClaims(accessToken);
             jwtUtil.validateToken(accessToken);
+            // throw가 안나는데 (boolean으로 나오는데...)
         } catch (ExpiredJwtException ex) {
             // 만료 시에는 알아서 재발급
             System.out.println("Access Token 토큰 만료 !!!");
             handleRefreshToken(request, response);
         } catch (Exception e) {
+            System.out.println("알 수 없는 오류!");
             filterChain.doFilter(request, response);
             return;
         }

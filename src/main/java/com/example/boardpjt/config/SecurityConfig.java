@@ -73,9 +73,10 @@ public class SecurityConfig {
         // === JWT 필터 추가 ===
         // JwtFilter를 UsernamePasswordAuthenticationFilter 앞에 추가
         // 모든 HTTP 요청이 JWT 필터를 먼저 거치도록 설정
-        http.addFilterBefore(new RefreshJwtFilter(jwtUtil, userDetailsService, refreshTokenRepository), JwtFilter.class);
-        http.addFilterBefore(new JwtFilter(jwtUtil, userDetailsService),
-                UsernamePasswordAuthenticationFilter.class);
+        http
+            .addFilterBefore(new JwtFilter(jwtUtil, userDetailsService),
+                UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new RefreshJwtFilter(jwtUtil, userDetailsService, refreshTokenRepository), JwtFilter.class);
 
         // 설정이 완료된 SecurityFilterChain 반환
         return http.build();
