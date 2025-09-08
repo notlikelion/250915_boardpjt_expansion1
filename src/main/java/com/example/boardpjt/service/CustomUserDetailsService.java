@@ -78,6 +78,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         // === 호출되는 시점들 ===
         // 1. 사용자가 로그인할 때 (AuthenticationManager가 호출)
         // 2. JWT 필터에서 토큰을 검증할 때 (JwtFilter에서 호출)
-        // 3. @PreAuthorize 등 권한 체크 시 필요한 경우
+        // 3. @PreAuthorize 등 권한 체크 시 필요한 경우 (AOP)
     }
 }
