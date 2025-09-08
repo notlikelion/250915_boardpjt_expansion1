@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>게시글 상세</title>
+</head>
+<body>
+<h1>게시글 상세</h1>
+
+<section>
+    <a th:href="@{/}">메인페이지로 이동</a>
+    <a th:href="@{/posts}">글 목록으로 이동</a>
+</section>
+
+<section>
+    <h2>게시글 보기</h2>
+    <section th:object="${post}">
+        <p>제목 : <span th:text="*{title}"></span></p>
+        <p>내용 : <span th:text="*{content}"></span></p>
+        <p>작성자 : <span th:text="*{author.username}"></span></p>
+        <p>작성일 : <span th:text="*{createdAt}"></span></p>
+        <p>수정일 : <span th:text="*{updatedAt}"></span></p>
+        <section th:if="${author.username == #authentication.name}">
+            <a th:href="@{/posts/{id}/edit(id=${id})">수정</a>
+            <form th:action="@{/posts/{id}/delete(id=${id})" method="post">
+                <button>삭제</button>
+            </form>
+        </section>
+    </section>
+</section>
+
+</body>
+</html>

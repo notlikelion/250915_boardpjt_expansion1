@@ -31,11 +31,15 @@ public class PostController {
     }
     // 개별 게시물
     @GetMapping("/{id}")
-    public String list(
+    public String detail(
             @PathVariable Long id,
             Model model) {
         // 각각 개별이니까... 1개.
         model.addAttribute("post",postService.findById(id));
+        // 구현하는 방법은 여러가지 -> 데이터를 불러오는 건 상관X.
+        // '내 게시물'임을 어떻게 보여줄 것이냐
+        // 1. controller에서 처리를 해서 authentication 등 비교 -> isMyPost...
+        // 2. #authencation.name -> entity, dto -> username.
         return "post/detail"; // templates/post/list.html
     }
     // 게시물 작성
