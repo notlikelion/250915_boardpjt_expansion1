@@ -4,12 +4,10 @@ import com.example.boardpjt.model.dto.PostDTO;
 import com.example.boardpjt.service.PostService;
 import com.example.boardpjt.service.UserAccountService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller // 스캔
 @RequiredArgsConstructor // 의존성
@@ -35,12 +33,19 @@ public class PostController {
     // 게시물 작성
     @GetMapping("/new")
     public String createForm(
-            Model model) {
-        model.addAttribute("post", new PostDTO.Request());
+            Model model, Authentication authentication) {
+        PostDTO.Request dto = new PostDTO.Request();
+        dto.setUsername(authentication.getName());
+        model.addAttribute("post", dto);
         return "post/form"; // templates/post/list.html
     }
     // POST 처리...
-
-    // 수정
-    // 삭제
+    @PostMapping("/new")
+    public String create(@ModelAttribute PostDTO.Request dto, Authentication authentication) {
+        // dto? -> username
+        // 불일치할 때 에러를?
+        dto.setUsername(authentication.getName());
+        postService.createPost(dto);
+        return "redirect:/posts";
+    }
 }
