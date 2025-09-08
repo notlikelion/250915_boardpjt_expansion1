@@ -1,6 +1,8 @@
 package com.example.boardpjt.config;
 
 import com.example.boardpjt.filter.JwtFilter;
+import com.example.boardpjt.filter.RefreshJwtFilter;
+import com.example.boardpjt.model.repository.RefreshTokenRepository;
 import com.example.boardpjt.service.CustomUserDetailsService;
 import com.example.boardpjt.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -71,12 +73,15 @@ public class SecurityConfig {
         // === JWT 필터 추가 ===
         // JwtFilter를 UsernamePasswordAuthenticationFilter 앞에 추가
         // 모든 HTTP 요청이 JWT 필터를 먼저 거치도록 설정
+        http.addFilterBefore(new RefreshJwtFilter(jwtUtil, userDetailsService, refreshTokenRepository), JwtFilter.class);
         http.addFilterBefore(new JwtFilter(jwtUtil, userDetailsService),
                 UsernamePasswordAuthenticationFilter.class);
 
         // 설정이 완료된 SecurityFilterChain 반환
         return http.build();
     }
+
+    private final RefreshTokenRepository refreshTokenRepository;
 
     /**
      * 비밀번호 인코더 빈 등록
