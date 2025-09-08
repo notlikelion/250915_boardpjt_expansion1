@@ -11,4 +11,12 @@ public class PostDTO {
         private String content;
         private String username;
     }
+
+    public record Response(
+            Long id,
+            String title,
+            String content,
+            String username,
+            String createdAt
+    ) {}
 }

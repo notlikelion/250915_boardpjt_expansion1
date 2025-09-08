@@ -19,10 +19,10 @@
     <a th:href="@{/posts/new}">게시글 작성</a>
     <ul>
         <li th:each="p : ${posts}">
-            <span th:text="${p.id}"></span>
-            <span th:text="${p.title}"></span>
-            <span th:text="${p.content}"></span>
-            <span th:text="${p.createdAt}"></span>
+            번호 : <span th:text="${p.id}"></span>
+            작성자 : <span th:text="${p.username}"></span>
+            제목 : <span th:text="${p.title}"></span>
+            작성일 : <span th:text="${p.createdAt}"></span>
             <a th:href="@{'/posts/' + ${p.id}}">자세히 보기</a>
         </li>
     </ul>

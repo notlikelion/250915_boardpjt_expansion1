@@ -18,7 +18,15 @@ public class PostController {
     // 게시물 목록
     @GetMapping
     public String list(Model model) {
-        model.addAttribute("posts", postService.findAll());
+        model.addAttribute("posts",
+                postService.findAll()
+                        .stream().map(p -> new PostDTO.Response(
+                                p.getId(),
+                                p.getTitle(),
+                                p.getContent(),
+                                p.getAuthor().getUsername(),
+                                p.getCreatedAt().toString()
+                        )));
         return "post/list"; // templates/post/list.html
     }
     // 개별 게시물
@@ -27,7 +35,7 @@ public class PostController {
             @PathVariable Long id,
             Model model) {
         // 각각 개별이니까... 1개.
-        model.addAttribute("post", postService.findById(id));
+        model.addAttribute("post",postService.findById(id));
         return "post/detail"; // templates/post/list.html
     }
     // 게시물 작성
