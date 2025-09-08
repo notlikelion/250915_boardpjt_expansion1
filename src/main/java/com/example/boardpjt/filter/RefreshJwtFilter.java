@@ -1,5 +1,6 @@
 package com.example.boardpjt.filter;
 
+import com.example.boardpjt.model.entity.RefreshToken;
 import com.example.boardpjt.model.repository.RefreshTokenRepository;
 import com.example.boardpjt.util.CookieUtil;
 import com.example.boardpjt.util.JwtUtil;
@@ -51,9 +52,33 @@ public class RefreshJwtFilter extends OncePerRequestFilter {
     }
 
     private void handleRefreshToken(HttpServletRequest request, HttpServletResponse response) {
-        // 1. RefreshToken CookieUtil -> Request
-        // 2. repository -> 저장되었는지 비교 -> 검증
-        // 3. accessToken 재발급 -> cookie.
-        // 이슈가 생기면... 내부에서 try-catch 예외 처리
+        try {
+            // 1. RefreshToken CookieUtil -> Request
+            String refreshToken = CookieUtil.findCookie(request, "refresh_token");
+            if (refreshToken == null) {
+                return;
+            }
+            String username = jwtUtil.getUsername(refreshToken); // refresh -> username
+            // 2. repository -> 저장되었는지 비교 -> 검증
+            RefreshToken stored = refreshTokenRepository.findById(username)
+                    .orElseThrow(() -> new RuntimeException("Redis에 Refresh 없음")); // stored -> store.
+            if (!refreshToken.equals(stored.getToken())) {
+                throw new RuntimeException("Refresh Token 불일치");
+            }
+            // 3. accessToken 재발급 -> cookie.
+            String role = jwtUtil.getRole(refreshToken);
+            String newAccessToken = jwtUtil.generateToken(username, role, false);
+            CookieUtil.createCookie(response, "access_token", newAccessToken, 60 * 60);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    userDetails,
+                    null,
+                    userDetails.getAuthorities()
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            // 이슈가 생기면... 내부에서 try-catch 예외 처리
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
     }
 }
