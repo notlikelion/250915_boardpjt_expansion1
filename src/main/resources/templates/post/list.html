@@ -20,10 +20,10 @@
     <ul>
         <li th:each="p : ${posts}">
             번호 : <span th:text="${p.id}"></span>
-            작성자 : <span th:text="${p.username}"></span>
-            제목 : <span th:text="${p.title}"></span>
-            작성일 : <span th:text="${p.createdAt}"></span>
-            <a th:href="@{'/posts/' + ${p.id}}">자세히 보기</a>
+            | 작성자 : <span th:text="${p.username}"></span>
+            | 제목 : <span th:text="${p.title}"></span>
+            | 작성일 : <span th:text="${p.createdAt}"></span>
+            | <a th:href="@{'/posts/' + ${p.id}}">자세히 보기</a>
         </li>
     </ul>
 </section>
