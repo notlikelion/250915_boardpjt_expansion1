@@ -1,6 +1,7 @@
 package com.example.boardpjt.controller;
 
 import com.example.boardpjt.model.dto.PostDTO;
+import com.example.boardpjt.model.entity.Post;
 import com.example.boardpjt.service.PostService;
 import com.example.boardpjt.service.UserAccountService;
 import lombok.RequiredArgsConstructor;
@@ -59,5 +60,25 @@ public class PostController {
         dto.setUsername(authentication.getName());
         postService.createPost(dto);
         return "redirect:/posts";
+    }
+
+    // 삭제
+    @PostMapping("/{id}/delete")
+    public String delete(@PathVariable Long id, Authentication authentication) {
+        // 나 자신만 삭제가 가능
+        try {
+            // 1번 : 삭제하려고 하는 사람과 주인이 다를 때
+            Post post = postService.findById(id);
+            String postUsername = post.getAuthor().getUsername();
+            if (!postUsername.equals(authentication.getName())) {
+                // 지금 자격증명의 유저(이름)와 게시물의 유저가 다르다.
+                throw new SecurityException("삭제 권한 없음");
+            }
+            // 2번 : 없는 걸 삭제하려고 할 때 (2번은 Service에서 throw를 하게...)
+            postService.deleteById(id);
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+        return "redirect:/posts"; // 문제 발생 시 목록으로 보냄
     }
 }
