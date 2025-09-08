@@ -33,5 +33,14 @@ public class CookieUtil {
         return null; // 아무것도 못찾았을 때
     }
 
-    // TODO: deleteCookie
+    public static void deleteCookie(HttpServletResponse response, String key) {
+        ResponseCookie cookie = ResponseCookie.from(key, "")
+                .httpOnly(true) // XSS 공격 방지 (JavaScript에서 접근 불가)
+                .path("/") // 쿠키가 유효한 경로 (전체 도메인)
+                .maxAge(0)
+                .build();
+
+        // HTTP 응답 헤더에 "Set-Cookie" 추가하여 클라이언트에 쿠키 전송
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
 }
