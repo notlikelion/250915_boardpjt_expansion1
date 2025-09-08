@@ -23,9 +23,9 @@
         <p>작성자 : <span th:text="*{author.username}"></span></p>
         <p>작성일 : <span th:text="*{createdAt}"></span></p>
         <p>수정일 : <span th:text="*{updatedAt}"></span></p>
-        <section th:if="${author.username == #authentication.name}">
-            <a th:href="@{/posts/{id}/edit(id=${id})">수정</a>
-            <form th:action="@{/posts/{id}/delete(id=${id})" method="post">
+        <section th:if="${post.author.username == #authentication.name}">
+            <a th:href="@{/posts/{id}/edit(id=${id})}">수정</a>
+            <form th:action="@{/posts/{id}/delete(id=${id})}" method="post">
                 <button>삭제</button>
             </form>
         </section>
