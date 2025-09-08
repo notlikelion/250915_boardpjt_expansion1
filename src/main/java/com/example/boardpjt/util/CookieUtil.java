@@ -1,5 +1,7 @@
 package com.example.boardpjt.util;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -18,7 +20,18 @@ public class CookieUtil {
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
-    // findCookie
+    public static String findCookie(HttpServletRequest request, String key) {
+        if (request.getCookies() != null) {
+            // 모든 쿠키를 순회하면서 "access_token" 이름의 쿠키 찾기
+            for (Cookie c : request.getCookies()) {
+//                if (c.getName().equals("access_token")) {
+                if (c.getName().equals(key)) {
+                    return c.getValue();
+                }
+            }
+        }
+        return null; // 아무것도 못찾았을 때
+    }
 
     // TODO: deleteCookie
 }
