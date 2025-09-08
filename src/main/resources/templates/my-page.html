@@ -40,7 +40,9 @@
     -->
     <span th:text="${username}"></span>님 반갑습니다!
 
-    <form th:action="${@{/auth/logout}"><button>로그아웃</button></form>
+    <form th:action="@{/auth/logout}" method="post">
+        <button>로그아웃</button>
+    </form>
 </section>
 </body>
 </html>

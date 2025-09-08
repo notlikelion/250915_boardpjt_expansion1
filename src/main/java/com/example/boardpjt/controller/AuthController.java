@@ -157,11 +157,13 @@ public class AuthController {
 
     // 로그아웃
     @PostMapping("/logout") // /auth/logout
-    public String logout(HttpServletResponse response) {
+    public String logout(HttpServletResponse response, Authentication authentication) {
         // 비어있는 쿠키를...
         // 쿠키를 제거해야한다.
         CookieUtil.deleteCookie(response, "access_token");
         CookieUtil.deleteCookie(response, "refresh_token");
+        // Refresh Token 지우기 완료
+        refreshTokenRepository.deleteById(authentication.getName());
         return "redirect:/"; // 모두가 접속 가능
 //        return "redirect:/login"; // 다른 계정으로 로그인할 수 있게 하는 정책
     }
