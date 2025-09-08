@@ -41,11 +41,19 @@ public class RefreshJwtFilter extends OncePerRequestFilter {
             jwtUtil.validateToken(accessToken);
         } catch (ExpiredJwtException ex) {
             // 만료 시에는 알아서 재발급
+            handleRefreshToken(request, response);
         } catch (Exception e) {
             filterChain.doFilter(request, response);
             return;
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private void handleRefreshToken(HttpServletRequest request, HttpServletResponse response) {
+        // 1. RefreshToken CookieUtil -> Request
+        // 2. repository -> 저장되었는지 비교 -> 검증
+        // 3. accessToken 재발급 -> cookie.
+        // 이슈가 생기면... 내부에서 try-catch 예외 처리
     }
 }
