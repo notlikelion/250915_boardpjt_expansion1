@@ -43,7 +43,7 @@ public class MainController {
             // authentication.getName()은 사용자의 Principal(주체)을 반환
             // 일반적으로 사용자명(username) 또는 이메일이 반환됨
             model.addAttribute("username", authentication.getName());
-
+            model.addAttribute("role", authentication.getAuthorities().iterator().next().getAuthority()); // 첫번째 Role
             // 추가로 사용할 수 있는 Authentication 정보들:
             // authentication.getAuthorities() - 사용자의 권한(역할) 목록
             // authentication.getDetails() - 추가적인 인증 세부정보 (IP 주소, 세션 ID 등)
