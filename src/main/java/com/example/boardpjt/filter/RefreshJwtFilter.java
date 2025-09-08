@@ -42,6 +42,7 @@ public class RefreshJwtFilter extends OncePerRequestFilter {
             jwtUtil.validateToken(accessToken);
         } catch (ExpiredJwtException ex) {
             // 만료 시에는 알아서 재발급
+            System.out.println("Access Token 토큰 만료 !!!");
             handleRefreshToken(request, response);
         } catch (Exception e) {
             filterChain.doFilter(request, response);
