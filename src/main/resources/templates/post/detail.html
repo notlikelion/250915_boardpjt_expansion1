@@ -120,7 +120,7 @@
             method: "POST"
         });
         if (response.ok) {
-            await loadComments();
+            await loadCounts();
             alert("팔로우 완료!");
             switchButton(false); // true -> 팔로우, false -> 언팔로우
         } else {
@@ -137,7 +137,7 @@
             method: "DELETE"
         });
         if (response.ok) {
-            await loadComments();
+            await loadCounts();
             alert("팔로우 해제 완료!");
             switchButton(true); // true -> 팔로우, false -> 언팔로우
         } else {
@@ -168,6 +168,7 @@
     }
 
     async function loadCounts() {
+        console.log("loadCounts() 호출!");
         const response1 = await fetch('/api/follow/[[${post.author.id}]]/followingCount',
             {
                 // "method": "GET",
