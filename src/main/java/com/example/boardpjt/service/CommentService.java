@@ -41,4 +41,14 @@ public class CommentService {
     public List<Comment> findByPostId(Long postId) {
         return commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
     }
+
+    @Transactional
+    public void deleteById(Long id) {
+        commentRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public Comment findById(Long id) {
+        return commentRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("댓글 없음"));
+    }
 }

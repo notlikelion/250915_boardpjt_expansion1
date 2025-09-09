@@ -69,4 +69,16 @@ public class CommentApiController {
 
     }
 
+    @DeleteMapping("{id}") // commentId
+    public ResponseEntity<Void> delete(@PathVariable Long id,
+                                       Authentication authentication) {
+        // 현재 이 댓글의 작성자와 삭제하려고 하는 사람이 일치하는지
+        Comment comment = commentService.findById(id);
+        if (!comment.getAuthor().getUsername().equals(authentication.getName())) {
+            // throw 꼭 할 필요는 없음
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        commentService.deleteById(id);
+        return ResponseEntity.notFound().build();
+    }
 }
