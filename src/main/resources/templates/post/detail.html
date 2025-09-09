@@ -118,6 +118,7 @@
         });
         if (response.ok) {
             alert("팔로우 완료!");
+            switchButton(false); // true -> 팔로우, false -> 언팔로우
         } else {
             alert("팔로우 실패!");
         }
@@ -133,6 +134,7 @@
         });
         if (response.ok) {
             alert("팔로우 해제 완료!");
+            switchButton(true); // true -> 팔로우, false -> 언팔로우
         } else {
             alert("팔로우 해제 실패!");
         }
@@ -140,6 +142,24 @@
     if (unfollowButton) {
         unfollowButton.addEventListener(
             "click", handleUnfollow);
+    }
+    function switchButton(isFollow) {
+        const followBox = document.querySelector("#followBox");
+        // isFollow : True/False
+        // True -> Follow
+        // False -> Unfollow
+        followBox.innerHTML = "";
+        const button = document.createElement("button");
+        if (isFollow) {
+            // 팔로우 버튼으로 바꾸기
+            button.textContent = "팔로우";
+            button.addEventListener("click", handleFollow);
+        }  else {
+            // 언팔로우 버튼으로 바꾸기
+            button.textContent = "언팔로우";
+            button.addEventListener("click", handleUnfollow);
+        }
+        followBox.appendChild(button);
     }
 
     document.addEventListener("DOMContentLoaded", loadComments);
