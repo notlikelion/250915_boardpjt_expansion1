@@ -7,10 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,8 +17,10 @@ public class CommentApiController {
 
     @PostMapping("/{postId}")
     public ResponseEntity<Comment> create(@PathVariable Long postId,
-                                 CommentDTO.Request dto,
+                                 // JSON Body -> 변환
+                                 @RequestBody CommentDTO.Request dto,
                                  Authentication authentication) {
+        System.out.println("dto = " + dto);
         try {
             if (!postId.equals(dto.postId())) {
                 throw new IllegalArgumentException("postId 불일치");
@@ -33,13 +32,16 @@ public class CommentApiController {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(commentService.addComment(dto));
         } catch (IllegalArgumentException ex) {
+            System.err.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (SecurityException ex) {
+            System.err.println(ex.getMessage());
             // 401 : 인증 - 정보 없음? -> 아예 jwt가 없거나 비로그인.
 //            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             // 403 : 인가 - 권한 없음 (level 문제)
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (Exception ex) {
+            System.err.println(ex.getMessage());
             return ResponseEntity.status(
                     HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
