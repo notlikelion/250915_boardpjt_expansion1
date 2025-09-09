@@ -51,8 +51,22 @@ public class CommentApiController {
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<List<Comment>> list(@PathVariable Long postId) {
-        return ResponseEntity.ok(commentService.findByPostId(postId));
+//    public ResponseEntity<List<Comment>> list(@PathVariable Long postId) {
+    public ResponseEntity<List<CommentDTO.Response>> list(
+            @PathVariable Long postId) {
+        // 그대로 내보내면 serializer 에러
+        // -> Comment -> UserAccount, Post
+        // CommentDTO.Response
+        return ResponseEntity.ok(
+                commentService.findByPostId(postId)
+                .stream().map(c -> new CommentDTO.Response(
+                        c.getId(),
+                        c.getPost().getId(),
+                        c.getContent(),
+                        c.getAuthor().getUsername(),
+                        c.getCreatedAt().toString()
+                        )).toList());
+
     }
 
 }

@@ -40,6 +40,7 @@
             <button>작성</button>
         </form>
         <!-- 이전 댓글 목록 (list) -->
+        <section id="commentList"></section>
     </section>
 </section>
 <script th:inline="javascript">
@@ -59,8 +60,31 @@
                     "username": [[${#authentication.name}]]
                 })
                 });
-
+        await loadComments();
     })
+
+    async function loadComments() {
+        const response = await fetch(`/api/comments/[[${post.id}]]`,
+            {
+                // "method": "GET",
+                "headers": { "Content-Type": "application/json" }
+            }
+        )
+        console.log(response);
+        if (!response.ok) { return; } // 원래는 예외처리 등을 해야하는데...
+
+        const comments = await response.json(); // Array(List) -> comment
+        const commentList = document.querySelector("#commentList");
+        commentList.innerHTML = "";
+        for (const c of comments) {
+            const p = document.createElement("p");
+            p.innerHTML =
+                `<strong>${c.username}</strong> : ${c.content} (${c.createdAt})`
+            commentList.appendChild(p);
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadComments);
 </script>
 </body>
 </html>
