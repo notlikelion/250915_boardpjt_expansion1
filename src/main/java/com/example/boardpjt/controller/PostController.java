@@ -39,29 +39,21 @@ public class PostController {
      * @param model Spring MVC의 Model 객체 - 뷰에 데이터 전달
      * @return String - 렌더링할 템플릿 파일명 (templates/post/list.html)
      */
-    @GetMapping // GET /posts 요청 처리
+    @GetMapping
     public String list(Model model) {
 
-        // === 게시물 데이터 조회 및 DTO 변환 ===
         model.addAttribute("posts",
-                // 1단계: 모든 게시물 조회 (Post Entity 리스트)
-                postService.findAll()
-                        // 2단계: Stream API를 사용하여 Entity → DTO 변환
+//                postService.findAll()
+                // Page<Post>
+                postService.findWithPagingAndSearch("", 0)
                         .stream().map(p -> new PostDTO.Response(
                                 p.getId(),                          // 게시물 ID
                                 p.getTitle(),                       // 제목
                                 p.getContent(),                     // 내용
-                                p.getAuthor().getUsername(),        // 작성자명 (UserAccount 연관관계)
+                                p.getAuthor().getUsername(),        // 작성자명
                                 p.getCreatedAt().toString()         // 작성일시 (문자열 변환)
                         ))
-                // 3단계: Stream을 List로 수집 (암시적으로 수행됨)
         );
-
-        // === DTO 변환의 장점 ===
-        // 1. 보안: Entity의 민감한 정보 (password 등) 노출 방지
-        // 2. 성능: 뷰에 필요한 데이터만 전달
-        // 3. 유지보수: Entity 변경이 뷰에 미치는 영향 최소화
-        // 4. API 호환성: JSON 응답 시 일관된 구조 제공
 
         return "post/list"; // templates/post/list.html 렌더링
     }
