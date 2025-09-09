@@ -25,8 +25,14 @@
             <!-- 나 자신이면 안 뜨고, 다른 사람이면 뜨는데... -->
             <!-- 이미 팔로우 상태면 팔로우 해제 이런식으로 뜨도록 처리 -->
             <!-- TODO : 작성자가 얼마나 많은 팔로잉과 팔로우가 있는지... -->
-            <button th:if="${#authentication.name != post.author.username}"
-                    id="followButton">팔로우</button>
+            <section th:if="${#authentication.name != post.author.username}">
+                <!-- 팔로우 중이면 언팔로우, 팔로우 X. 팔로우      -->
+                <button th:unless="${followCheck}"
+                        id="followButton">팔로우</button>
+                <button th:if="${followCheck}"
+                        id="unfollowButton">언팔로우</button>
+            </section>
+
         </p>
         <p>작성일 : <span th:text="*{createdAt}"></span></p>
         <p>수정일 : <span th:text="*{updatedAt}"></span></p>

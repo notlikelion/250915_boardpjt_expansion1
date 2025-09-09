@@ -188,6 +188,11 @@ public class UserAccountService {
         // 예외 발생 시 모든 변경사항이 롤백되어 데이터 일관성 보장
     }
 
+    public UserAccount findByUsername(String name) {
+        return userAccountRepository.findByUsername(name)
+                .orElseThrow();
+    }
+
     // === 추가 구현 고려사항 ===
 
     /**

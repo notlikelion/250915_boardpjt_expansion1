@@ -2,6 +2,7 @@ package com.example.boardpjt.controller;
 
 import com.example.boardpjt.model.dto.PostDTO;
 import com.example.boardpjt.model.entity.Post;
+import com.example.boardpjt.model.entity.UserAccount;
 import com.example.boardpjt.service.PostService;
 import com.example.boardpjt.service.UserAccountService;
 import lombok.RequiredArgsConstructor;
@@ -72,22 +73,22 @@ public class PostController {
         return "post/list"; // templates/post/list.html 렌더링
     }
 
-    /**
-     * 게시물 상세 페이지
-     * 특정 게시물의 상세 정보를 표시
-     *
-     * @param id 조회할 게시물의 ID (URL 경로에서 추출)
-     * @param model Spring MVC의 Model 객체 - 뷰에 데이터 전달
-     * @return String - 렌더링할 템플릿 파일명 (templates/post/detail.html)
-     */
+    private final UserAccountService userAccountService;
+
     @GetMapping("/{id}") // GET /posts/123 형태의 요청 처리
-    public String detail(@PathVariable Long id, Model model) {
+    public String detail(@PathVariable Long id, Model model,
+                         Authentication authentication) {
         // @PathVariable: URL 경로의 {id} 부분을 메서드 매개변수로 바인딩
+        UserAccount userAccount = userAccountService.findByUsername(authentication.getName());
+        Post post = postService.findById(id);
+        boolean followCheck = post.getAuthor().getFollowers().contains(userAccount);
+
+        model.addAttribute("followCheck", followCheck);
 
         // === 개별 게시물 조회 ===
         // PostService를 통해 특정 ID의 게시물 조회
         // 존재하지 않는 ID인 경우 Service에서 예외 처리 필요
-        model.addAttribute("post", postService.findById(id));
+        model.addAttribute("post", post);
 
         // === '내 게시물' 표시 방법 고려사항 ===
         // 현재는 Entity를 직접 전달하고 있으며, 뷰에서 작성자 확인 가능한 방법들:
