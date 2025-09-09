@@ -79,6 +79,6 @@ public class CommentApiController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         commentService.deleteById(id);
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.noContent().build(); // notFound 아님...
     }
 }
