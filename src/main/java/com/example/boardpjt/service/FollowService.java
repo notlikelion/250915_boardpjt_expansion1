@@ -39,4 +39,12 @@ public class FollowService {
                 .orElseThrow(() -> new IllegalArgumentException("대상 없음"));
         follower.unfollow(target);
     }
+
+    public int getFollowingCount(Long userId) {
+        return userAccountRepository.findById(userId).orElseThrow().getFollowingCount();
+    }
+
+    public int getFollowerCount(Long userId) {
+        return userAccountRepository.findById(userId).orElseThrow().getFollowerCount();
+    }
 }

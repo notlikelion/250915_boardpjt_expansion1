@@ -24,7 +24,10 @@
             <span th:text="*{author.username}"></span>
             <!-- 나 자신이면 안 뜨고, 다른 사람이면 뜨는데... -->
             <!-- 이미 팔로우 상태면 팔로우 해제 이런식으로 뜨도록 처리 -->
-            <!-- TODO : 작성자가 얼마나 많은 팔로잉과 팔로우가 있는지... -->
+            <section id="followCount">
+                팔로잉 : <span id="followingCount"></span>
+                / 팔로워 : <span id="followerCount"></span>
+            </section>
             <section id="followBox" th:if="${#authentication.name != post.author.username}">
                 <!-- 팔로우 중이면 언팔로우, 팔로우 X. 팔로우      -->
                 <button th:unless="${followCheck}"
@@ -119,6 +122,7 @@
         if (response.ok) {
             alert("팔로우 완료!");
             switchButton(false); // true -> 팔로우, false -> 언팔로우
+            loadComments();
         } else {
             alert("팔로우 실패!");
         }
@@ -135,6 +139,7 @@
         if (response.ok) {
             alert("팔로우 해제 완료!");
             switchButton(true); // true -> 팔로우, false -> 언팔로우
+            loadComments();
         } else {
             alert("팔로우 해제 실패!");
         }
@@ -162,7 +167,29 @@
         followBox.appendChild(button);
     }
 
+    async function loadCounts() {
+        const response1 = await fetch('/api/follow/[[${post.author.id}]]/followingCount',
+            {
+                // "method": "GET",
+                "headers": { "Content-Type": "application/json" }
+            }
+        )
+        const response2 = await fetch('/api/follow/[[${post.author.id}]]/followerCount',
+            {
+                // "method": "GET",
+                "headers": { "Content-Type": "application/json" }
+            }
+        )
+        // 해당 작성자가 팔로우한 수
+        const followingCount = document.querySelector("#followingCount");
+        followingCount.textContent = await response1.text(); // 숫자라서...
+        // follower <- 해당 작성자를 팔로우한 사람 수
+        const followerCount = document.querySelector("#followerCount");
+        followerCount.textContent = await response2.text(); // 숫자라서...
+    }
+
     document.addEventListener("DOMContentLoaded", loadComments);
+    document.addEventListener("DOMContentLoaded", loadCounts);
 </script>
 </body>
 </html>
