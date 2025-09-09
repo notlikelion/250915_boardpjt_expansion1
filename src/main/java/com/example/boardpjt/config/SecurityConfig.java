@@ -97,17 +97,16 @@ public class SecurityConfig {
 
         // === JWT 필터 체인 구성 (중요: 순서가 매우 중요함) ===
         http
-                // 1단계: RefreshJwtFilter를 가장 먼저 배치
-                // - Refresh Token 갱신 요청을 우선 처리
-                // - /auth/refresh 경로에 대한 특별한 처리 담당
-                .addFilterBefore(new RefreshJwtFilter(jwtUtil, userDetailsService, refreshTokenRepository),
-                        JwtFilter.class)
-
                 // 2단계: JwtFilter를 UsernamePasswordAuthenticationFilter 앞에 배치
                 // - 일반적인 Access Token 검증 담당
                 // - 모든 HTTP 요청에 대해 JWT 토큰 유효성 검증
                 .addFilterBefore(new JwtFilter(jwtUtil, userDetailsService),
-                        UsernamePasswordAuthenticationFilter.class);
+                        UsernamePasswordAuthenticationFilter.class)
+                // 1단계: RefreshJwtFilter를 가장 먼저 배치
+                // - Refresh Token 갱신 요청을 우선 처리
+                // - /auth/refresh 경로에 대한 특별한 처리 담당
+                        .addFilterBefore(new RefreshJwtFilter(jwtUtil, userDetailsService, refreshTokenRepository),
+                        JwtFilter.class);
 
         // === 필터 체인 실행 순서 ===
         // 1. RefreshJwtFilter: Refresh Token 갱신 처리

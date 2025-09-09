@@ -214,6 +214,28 @@ public class PostController {
         // 사용자에게 일관된 경험 제공
         return "redirect:/posts";
     }
+
+    @GetMapping("/{id}/edit")
+    public String editForm(@PathVariable Long id, Model model, Authentication authentication) {
+        Post post = postService.findById(id);
+        if (!post.getAuthor().getUsername().equals(authentication.getName())) {
+            return "redirect:/posts/" + id; // 권한 없으면 세부 페이지로 이동
+        }
+        // form -> audit X
+        model.addAttribute("post", post); // binding -> form
+        return "post/edit"; // templates/post/edit.html
+    }
+
+    @PostMapping("/{id}/edit")
+    public String edit(@PathVariable Long id, @ModelAttribute PostDTO.Request dto, Authentication authentication) {
+        dto.setUsername(authentication.getName()); // 인증 정보를 바탕으로 편집자 정보를 넣고
+        try {
+            postService.updatePost(id, dto); // service를 사용해서 수정 저장 처리
+        } catch (Exception e) {
+            return "redirect:/posts/" + id + "/edit";
+        }
+        return "redirect:/posts";
+    }
 }
 
 // === 보안 고려사항 ===

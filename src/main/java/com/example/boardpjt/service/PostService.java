@@ -49,11 +49,15 @@ public class PostService {
         postRepository.deleteById(id);
     }
 
-    // -------------------------
-    // 3. update
-    // 4. delete v
-
-    // 페이징, 검색 쿼리 -> 내일 오전
-    // 내일 오후 -> 댓글. (추천/좋아요). 팔로우.
-    // 남은 시간. 질답.
+    @Transactional
+    public void updatePost(Long id, PostDTO.Request dto) {
+        Post post = findById(id); // 없으면 예외처리로...
+        // 작성자와 수정을 하려는 사람이 다르다
+        if (!post.getAuthor().getUsername().equals(dto.getUsername())) {
+            throw new SecurityException("작성자만 수정 가능");
+        }
+        post.setTitle(dto.getTitle());
+        post.setContent(dto.getContent());
+        postRepository.save(post);
+    }
 }
