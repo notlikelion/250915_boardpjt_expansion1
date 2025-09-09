@@ -120,9 +120,9 @@
             method: "POST"
         });
         if (response.ok) {
+            await loadComments();
             alert("팔로우 완료!");
             switchButton(false); // true -> 팔로우, false -> 언팔로우
-            loadComments();
         } else {
             alert("팔로우 실패!");
         }
@@ -137,9 +137,9 @@
             method: "DELETE"
         });
         if (response.ok) {
+            await loadComments();
             alert("팔로우 해제 완료!");
             switchButton(true); // true -> 팔로우, false -> 언팔로우
-            loadComments();
         } else {
             alert("팔로우 해제 실패!");
         }
