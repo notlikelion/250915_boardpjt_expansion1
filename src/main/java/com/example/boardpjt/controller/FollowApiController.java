@@ -18,12 +18,14 @@ import java.util.List;
 public class FollowApiController {
     private final FollowService followService;
 
+    // POST /api/follow/{userId}
     @PostMapping("/{userId}")
     public void follow(@PathVariable Long userId,
                                  Authentication authentication) {
         followService.followUser(authentication.getName(), userId);
     }
 
+    // DELETE /api/follow/{userId}
     @DeleteMapping("/{userId}")
     public void unfollow(@PathVariable Long userId,
                        Authentication authentication) {

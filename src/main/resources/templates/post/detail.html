@@ -20,7 +20,14 @@
     <section th:object="${post}">
         <p>제목 : <span th:text="*{title}"></span></p>
         <p>내용 : <span th:text="*{content}"></span></p>
-        <p>작성자 : <span th:text="*{author.username}"></span></p>
+        <p>작성자 :
+            <span th:text="*{author.username}"></span>
+            <!-- 나 자신이면 안 뜨고, 다른 사람이면 뜨는데... -->
+            <!-- 이미 팔로우 상태면 팔로우 해제 이런식으로 뜨도록 처리 -->
+            <!-- TODO : 작성자가 얼마나 많은 팔로잉과 팔로우가 있는지... -->
+            <button th:if="${#authentication.name != post.author.username}"
+                    id="followButton">팔로우</button>
+        </p>
         <p>작성일 : <span th:text="*{createdAt}"></span></p>
         <p>수정일 : <span th:text="*{updatedAt}"></span></p>
         <section th:if="${post.author.username == #authentication.name}">
