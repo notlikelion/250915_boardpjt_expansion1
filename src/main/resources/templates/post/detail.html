@@ -103,6 +103,20 @@
         }
     }
 
+    const followButton = document.querySelector("#followButton");
+    followButton.addEventListener(
+        "click", async () => {
+            const response = await fetch('/api/follow/[[${post.author.id}]]', {
+                method: "POST"
+            });
+            if (response.ok) {
+                alert("팔로우 완료!");
+            } else {
+                alert("팔로우 실패!");
+            }
+        }
+    );
+
     document.addEventListener("DOMContentLoaded", loadComments);
 </script>
 </body>
