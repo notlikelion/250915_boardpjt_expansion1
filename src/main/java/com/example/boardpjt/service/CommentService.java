@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service // 스캔
 @RequiredArgsConstructor // 생성자 자동 생성 (의존성 주입)
 public class CommentService {
@@ -33,5 +35,10 @@ public class CommentService {
         comment.setContent(dto.content());
         // id 자동생성
         return commentRepository.save(comment); // RESTful.
+    }
+
+    @Transactional(readOnly = true)
+    public List<Comment> findByPostId(Long postId) {
+        return commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
     }
 }
