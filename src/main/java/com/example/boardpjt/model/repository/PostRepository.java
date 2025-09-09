@@ -29,6 +29,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // or Content -> Containing
     Page<Post> findByTitleContainingOrContentContaining(
             String title, String content, Pageable pageable);
+
+    // 최신순으로
+    Page<Post> findByTitleContainingOrContentContainingOrderByIdDesc(
+            String title, String content, Pageable pageable);
+    // Desc -> PK (Long id)
 }
 
 // === Repository 확장 시 고려사항 ===

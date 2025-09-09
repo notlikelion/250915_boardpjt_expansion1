@@ -26,6 +26,21 @@
             | <a th:href="@{'/posts/' + ${p.id}}">자세히 보기</a>
         </li>
     </ul>
+    <!-- 페이징 -->
+    <section>
+        <!-- #numbers.sequence -> 끝값을 포함 -->
+        <span th:each="i : ${#numbers.sequence(1, totalPages)}">
+            <a th:if="${i != currentPage}"
+               th:href="@{/posts?page={id}(id=${i})}"
+               th:text="${i}"></a>
+            <a th:if="${i == currentPage}"
+               th:href="@{/posts?page={id}(id=${i})}"
+               th:text="${i}"
+               style="font-weight:bold;">
+                ${i}
+            </a>
+        </span>
+    </section>
 </section>
 
 </body>

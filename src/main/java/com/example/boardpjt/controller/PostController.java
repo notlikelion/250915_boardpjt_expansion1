@@ -5,6 +5,7 @@ import com.example.boardpjt.model.entity.Post;
 import com.example.boardpjt.service.PostService;
 import com.example.boardpjt.service.UserAccountService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -40,13 +41,21 @@ public class PostController {
      * @return String - 렌더링할 템플릿 파일명 (templates/post/list.html)
      */
     @GetMapping
-    public String list(Model model) {
-
+    public String list(Model model,
+//                       @RequestParam(defaultValue = "1", required = false) int page) {
+                       @RequestParam(defaultValue = "1") int page) {
+        // 유저는 페이지가 1씩 시작하는게 자연스러워요
+        Page<Post> postPage = postService.findWithPagingAndSearch("", page - 1);
+        // 현재 페이지
+        model.addAttribute("currentPage", page);
+        // 전체 페이지
+        model.addAttribute("totalPages", postPage.getTotalPages());
+        // 전달할 게시물 데이터
         model.addAttribute("posts",
 //                postService.findAll()
                 // Page<Post>
-                postService.findWithPagingAndSearch("", 0)
-                        .stream().map(p -> new PostDTO.Response(
+                postPage.getContent() // list화
+                .stream().map(p -> new PostDTO.Response(
                                 p.getId(),                          // 게시물 ID
                                 p.getTitle(),                       // 제목
                                 p.getContent(),                     // 내용

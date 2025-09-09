@@ -44,7 +44,8 @@ public class PostService {
         // 키워드 구현은 조금 이따가...
         // TODO : keyword
         Pageable pageable = PageRequest.of(page, 5);
-        return postRepository.findByTitleContainingOrContentContaining(keyword, keyword, pageable);
+//        return postRepository.findByTitleContainingOrContentContaining(keyword, keyword, pageable);
+        return postRepository.findByTitleContainingOrContentContainingOrderByIdDesc(keyword, keyword, pageable);
     }
 
     // 2-2. findOne (byId...)
