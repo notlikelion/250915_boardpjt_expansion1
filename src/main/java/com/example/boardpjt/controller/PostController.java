@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -43,9 +44,13 @@ public class PostController {
     @GetMapping
     public String list(Model model,
 //                       @RequestParam(defaultValue = "1", required = false) int page) {
-                       @RequestParam(defaultValue = "1") int page) {
+                       @RequestParam(defaultValue = "1") int page,
+                       @RequestParam(required = false) String keyword) {
+        if (!StringUtils.hasText(keyword)) {
+            keyword = ""; // 명백히 빈 텍스트 (null 이런거 처리)
+        }
         // 유저는 페이지가 1씩 시작하는게 자연스러워요
-        Page<Post> postPage = postService.findWithPagingAndSearch("", page - 1);
+        Page<Post> postPage = postService.findWithPagingAndSearch(keyword, page - 1);
         // 현재 페이지
         model.addAttribute("currentPage", page);
         // 전체 페이지

@@ -37,10 +37,14 @@
                th:href="@{/posts?page={id}(id=${i})}"
                th:text="${i}"
                style="font-weight:bold;">
-                ${i}
             </a>
         </span>
     </section>
+    <!-- 검색 -->
+    <form th:action="@{/posts}">
+        <input name="keyword" placeholder="검색어를 입력하세요">
+        <button>검색</button>
+    </form>
 </section>
 
 </body>
