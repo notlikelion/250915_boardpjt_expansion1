@@ -77,9 +77,21 @@
         const commentList = document.querySelector("#commentList");
         commentList.innerHTML = "";
         for (const c of comments) {
+        // c -> username. == #authentication.name
             const p = document.createElement("p");
             p.innerHTML =
                 `<strong>${c.username}</strong> : ${c.content} (${c.createdAt})`
+            if (c.username == [[${#authentication.name}]]) {
+                const button = document.createElement("button");
+                button.textContent = "삭제";
+                button.addEventListener("click", async () => {
+                    await fetch(`/api/comments/${c.id}`, {
+                        method: "DELETE"
+                    });
+                    await loadComments(); // 갱신하는 코드까지
+                })
+                p.appendChild(button);
+            }
             commentList.appendChild(p);
         }
     }
