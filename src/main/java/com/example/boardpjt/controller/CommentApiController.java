@@ -1,0 +1,47 @@
+package com.example.boardpjt.controller;
+
+import com.example.boardpjt.model.dto.CommentDTO;
+import com.example.boardpjt.model.entity.Comment;
+import com.example.boardpjt.service.CommentService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/comments")
+public class CommentApiController {
+    private final CommentService commentService;
+
+    @PostMapping("/{postId}")
+    public ResponseEntity<Comment> create(@PathVariable Long postId,
+                                 CommentDTO.Request dto,
+                                 Authentication authentication) {
+        try {
+            if (!postId.equals(dto.postId())) {
+                throw new IllegalArgumentException("postId 불일치");
+            }
+            //
+            if (!dto.username().equals(authentication.getName())) {
+                throw new SecurityException("작성자와 불일치");
+            }
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(commentService.addComment(dto));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (SecurityException ex) {
+            // 401 : 인증 - 정보 없음? -> 아예 jwt가 없거나 비로그인.
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            // 403 : 인가 - 권한 없음 (level 문제)
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (Exception ex) {
+            return ResponseEntity.status(
+                    HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+}
