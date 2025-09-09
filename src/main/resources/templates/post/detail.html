@@ -25,15 +25,17 @@
             <!-- 나 자신이면 안 뜨고, 다른 사람이면 뜨는데... -->
             <!-- 이미 팔로우 상태면 팔로우 해제 이런식으로 뜨도록 처리 -->
             <!-- TODO : 작성자가 얼마나 많은 팔로잉과 팔로우가 있는지... -->
-            <section th:if="${#authentication.name != post.author.username}">
+            <section id="followBox" th:if="${#authentication.name != post.author.username}">
                 <!-- 팔로우 중이면 언팔로우, 팔로우 X. 팔로우      -->
                 <button th:unless="${followCheck}"
                         id="followButton">팔로우</button>
                 <button th:if="${followCheck}"
                         id="unfollowButton">언팔로우</button>
             </section>
-
         </p>
+        <!-- 1. 언팔로우 기능 -->
+        <!-- 2. 팔로우/언팔로우 시 버튼 바뀌기 -->
+        <!-- 3. 카운팅 정보를 넣는 섹션 -->
         <p>작성일 : <span th:text="*{createdAt}"></span></p>
         <p>수정일 : <span th:text="*{updatedAt}"></span></p>
         <section th:if="${post.author.username == #authentication.name}">
@@ -110,18 +112,35 @@
     }
 
     const followButton = document.querySelector("#followButton");
-    followButton.addEventListener(
-        "click", async () => {
-            const response = await fetch('/api/follow/[[${post.author.id}]]', {
-                method: "POST"
-            });
-            if (response.ok) {
-                alert("팔로우 완료!");
-            } else {
-                alert("팔로우 실패!");
-            }
+    async function handleFollow() {
+        const response = await fetch('/api/follow/[[${post.author.id}]]', {
+            method: "POST"
+        });
+        if (response.ok) {
+            alert("팔로우 완료!");
+        } else {
+            alert("팔로우 실패!");
         }
-    );
+    }
+    if (followButton) {
+        followButton.addEventListener(
+            "click", handleFollow);
+    }
+    const unfollowButton = document.querySelector("#unfollowButton");
+    async function handleUnfollow() {
+        const response = await fetch('/api/follow/[[${post.author.id}]]', {
+            method: "DELETE"
+        });
+        if (response.ok) {
+            alert("팔로우 해제 완료!");
+        } else {
+            alert("팔로우 해제 실패!");
+        }
+    }
+    if (unfollowButton) {
+        unfollowButton.addEventListener(
+            "click", handleUnfollow);
+    }
 
     document.addEventListener("DOMContentLoaded", loadComments);
 </script>
