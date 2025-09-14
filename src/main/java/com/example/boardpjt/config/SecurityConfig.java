@@ -2,7 +2,9 @@ package com.example.boardpjt.config;
 
 import com.example.boardpjt.filter.JwtFilter;
 import com.example.boardpjt.filter.RefreshJwtFilter;
+import com.example.boardpjt.handler.OAuth2LoginSuccessHandler;
 import com.example.boardpjt.model.repository.RefreshTokenRepository;
+import com.example.boardpjt.service.CustomOAuth2UserService;
 import com.example.boardpjt.service.CustomUserDetailsService;
 import com.example.boardpjt.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +40,9 @@ public class SecurityConfig {
     // Refresh Token을 데이터베이스에서 관리하기 위한 Repository
     // Access Token과 달리 Refresh Token은 서버에서 상태를 관리해야 함
     private final RefreshTokenRepository refreshTokenRepository;
+
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     /**
      * 보안 필터 체인 설정 (Refresh Token 지원)
@@ -106,7 +111,14 @@ public class SecurityConfig {
                 // - Refresh Token 갱신 요청을 우선 처리
                 // - /auth/refresh 경로에 대한 특별한 처리 담당
                         .addFilterBefore(new RefreshJwtFilter(jwtUtil, userDetailsService, refreshTokenRepository),
-                        JwtFilter.class);
+                        JwtFilter.class)
+                // OAuth2 로그인 설정
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService) // 커스텀 서비스 등록
+                        )
+                        .successHandler(oAuth2LoginSuccessHandler) // 성공 핸들러 등록
+                );
 
         // === 필터 체인 실행 순서 ===
         // 1. RefreshJwtFilter: Refresh Token 갱신 처리

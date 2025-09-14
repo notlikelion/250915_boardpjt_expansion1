@@ -105,4 +105,6 @@ public class UserAccount {
     public int getFollowingCount() {
         return following.size();
     }
+
+    private String provider; // "kakao" 등 소셜 로그인 제공자 이름 저장
 }
