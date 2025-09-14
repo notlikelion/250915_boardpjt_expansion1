@@ -1,196 +1,135 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>게시글 상세</title>
+    <title th:text="${post.title}"></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<h1>게시글 상세</h1>
+<div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<section>
-    <a th:href="@{/}">메인페이지로 이동</a>
-    <a th:href="@{/posts}">글 목록으로 이동</a>
-</section>
-
-<section>
-    <h2>게시글 보기</h2>
-    <section th:object="${post}">
-        <p>제목 : <span th:text="*{title}"></span></p>
-        <p>내용 : <span th:text="*{content}"></span></p>
-        <p>작성자 :
-            <span th:text="*{author.username}"></span>
-            <!-- 나 자신이면 안 뜨고, 다른 사람이면 뜨는데... -->
-            <!-- 이미 팔로우 상태면 팔로우 해제 이런식으로 뜨도록 처리 -->
-            <section id="followCount">
-                팔로잉 : <span id="followingCount"></span>
-                / 팔로워 : <span id="followerCount"></span>
-            </section>
-            <section id="followBox" th:if="${#authentication.name != post.author.username}">
-                <!-- 팔로우 중이면 언팔로우, 팔로우 X. 팔로우      -->
-                <button th:unless="${followCheck}"
-                        id="followButton">팔로우</button>
-                <button th:if="${followCheck}"
-                        id="unfollowButton">언팔로우</button>
-            </section>
-        </p>
-        <!-- 1. 언팔로우 기능 -->
-        <!-- 2. 팔로우/언팔로우 시 버튼 바뀌기 -->
-        <!-- 3. 카운팅 정보를 넣는 섹션 -->
-        <p>작성일 : <span th:text="*{createdAt}"></span></p>
-        <p>수정일 : <span th:text="*{updatedAt}"></span></p>
-        <section th:if="${post.author.username == #authentication.name}">
-            <a th:href="@{/posts/{id}/edit(id=${id})}">수정</a>
-            <form th:action="@{/posts/{id}/delete(id=${id})}" method="post">
-                <button>삭제</button>
+<main class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a th:href="@{/posts}" class="btn btn-secondary">목록으로</a>
+        <div th:if="${#authentication != null and #authentication.name == post.author.username}">
+            <a th:href="@{/posts/{id}/edit(id=${post.id})}" class="btn btn-warning">수정</a>
+            <form th:action="@{/posts/{id}/delete(id=${post.id})}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-danger">삭제</button>
             </form>
-        </section>
-    </section>
+        </div>
+    </div>
 
-    <!-- 댓글 -->
-    <section>
+    <div class="card">
+        <div class="card-header">
+            <h2 th:text="${post.title}"></h2>
+            <div class="text-muted">
+                <span>작성자: </span><span th:text="${post.author.username}"></span> |
+                <span>작성일: </span><span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}"></span> |
+                <span>수정일: </span><span th:text="${#temporals.format(post.updatedAt, 'yyyy-MM-dd HH:mm')}"></span>
+            </div>
+            <div th:if="${#authentication != null and #authentication.name != post.author.username}" class="mt-2">
+                팔로잉: <span id="followingCount"></span> / 팔로워: <span id="followerCount"></span>
+                <button th:unless="${followCheck}" id="followButton" class="btn btn-sm btn-info">팔로우</button>
+                <button th:if="${followCheck}" id="unfollowButton" class="btn btn-sm btn-outline-info">언팔로우</button>
+            </div>
+        </div>
+        <div class="card-body">
+            <p class="card-text" style="white-space: pre-wrap;" th:text="${post.content}"></p>
+        </div>
+    </div>
+
+    <div class="mt-4">
         <h3>댓글</h3>
-        <!-- 댓글 작성 (form) -->
-        <form id="commentForm">
-            <textarea id="commentContent" placeholder="댓글을 입력하세요"></textarea>
-            <button>작성</button>
-        </form>
-        <!-- 이전 댓글 목록 (list) -->
-        <section id="commentList"></section>
-    </section>
-</section>
-<script th:inline="javascript">
-    // 각각 요소에 대한 지정
-    const commentForm = document.querySelector("#commentForm");
-    const commentContent = document.querySelector("#commentContent");
+        <div th:if="${#authentication != null and #authentication.isAuthenticated()}">
+            <form id="commentForm" class="mb-3">
+                <div class="input-group">
+                    <textarea id="commentContent" class="form-control" placeholder="댓글을 입력하세요"></textarea>
+                    <button class="btn btn-outline-primary" type="submit">작성</button>
+                </div>
+            </form>
+        </div>
+        <div id="commentList" class="list-group"></div>
+    </div>
+</main>
 
-    commentForm.addEventListener("submit", async (event) => {
-        event.preventDefault(); // 기본 form 작업을 막음
-        await fetch(`/api/comments/[[${post.id}]]`,
-                {
-                "method": "POST",
-                "headers": { "Content-Type": "application/json" },
-                "body": JSON.stringify({
-                    "postId": [[${post.id}]],
-                    "content": commentContent.value,
-                    "username": [[${#authentication.name}]]
-                })
-                });
-        await loadComments();
-    })
+<div th:replace="~{fragments/footer :: footerFragment}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script th:inline="javascript">
+    const postId = /*[[${post.id}]]*/ 0;
+    const authorId = /*[[${post.author.id}]]*/ 0;
+    const currentUsername = /*[[${#authentication != null ? #authentication.name : null}]]*/ null;
 
     async function loadComments() {
-        const response = await fetch(`/api/comments/[[${post.id}]]`,
-            {
-                // "method": "GET",
-                "headers": { "Content-Type": "application/json" }
-            }
-        )
-        console.log(response);
-        if (!response.ok) { return; } // 원래는 예외처리 등을 해야하는데...
-
-        const comments = await response.json(); // Array(List) -> comment
-        const commentList = document.querySelector("#commentList");
+        const response = await fetch(`/api/comments/${postId}`);
+        if (!response.ok) return;
+        const comments = await response.json();
+        const commentList = document.getElementById("commentList");
         commentList.innerHTML = "";
-        for (const c of comments) {
-        // c -> username. == #authentication.name
-            const p = document.createElement("p");
-            p.innerHTML =
-                `<strong>${c.username}</strong> : ${c.content} (${c.createdAt})`
-            if (c.username == [[${#authentication.name}]]) {
-                const button = document.createElement("button");
-                button.textContent = "삭제";
-                button.addEventListener("click", async () => {
-                    await fetch(`/api/comments/${c.id}`, {
-                        method: "DELETE"
-                    });
-                    await loadComments(); // 갱신하는 코드까지
-                })
-                p.appendChild(button);
+        comments.forEach(c => {
+            const item = document.createElement("div");
+            item.className = "list-group-item d-flex justify-content-between align-items-center";
+            item.innerHTML = `<div><strong>${c.username}</strong>: ${c.content} <small class="text-muted">(${c.createdAt})</small></div>`;
+
+            if (c.username === currentUsername) {
+                const deleteBtn = document.createElement("button");
+                deleteBtn.className = "btn btn-danger btn-sm";
+                deleteBtn.textContent = "삭제";
+                deleteBtn.onclick = async () => {
+                    await fetch(`/api/comments/${c.id}`, { method: "DELETE" });
+                    loadComments();
+                };
+                item.appendChild(deleteBtn);
             }
-            commentList.appendChild(p);
-        }
+            commentList.appendChild(item);
+        });
     }
 
-    const followButton = document.querySelector("#followButton");
-    async function handleFollow() {
-        const response = await fetch('/api/follow/[[${post.author.id}]]', {
-            method: "POST"
+    const commentForm = document.getElementById("commentForm");
+    if(commentForm) {
+        commentForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const content = document.getElementById("commentContent").value;
+            await fetch(`/api/comments/${postId}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ postId, content, username: currentUsername }),
+            });
+            document.getElementById("commentContent").value = "";
+            loadComments();
         });
-        if (response.ok) {
-            await loadCounts();
-            alert("팔로우 완료!");
-            switchButton(false); // true -> 팔로우, false -> 언팔로우
-        } else {
-            alert("팔로우 실패!");
-        }
     }
-    if (followButton) {
-        followButton.addEventListener(
-            "click", handleFollow);
-    }
-    const unfollowButton = document.querySelector("#unfollowButton");
-    async function handleUnfollow() {
-        const response = await fetch('/api/follow/[[${post.author.id}]]', {
-            method: "DELETE"
-        });
-        if (response.ok) {
-            await loadCounts();
-            alert("팔로우 해제 완료!");
-            switchButton(true); // true -> 팔로우, false -> 언팔로우
-        } else {
-            alert("팔로우 해제 실패!");
-        }
-    }
-    if (unfollowButton) {
-        unfollowButton.addEventListener(
-            "click", handleUnfollow);
-    }
-    function switchButton(isFollow) {
-        const followBox = document.querySelector("#followBox");
-        // isFollow : True/False
-        // True -> Follow
-        // False -> Unfollow
-        followBox.innerHTML = "";
-        const button = document.createElement("button");
-        if (isFollow) {
-            // 팔로우 버튼으로 바꾸기
-            button.textContent = "팔로우";
-            button.addEventListener("click", handleFollow);
-        }  else {
-            // 언팔로우 버튼으로 바꾸기
-            button.textContent = "언팔로우";
-            button.addEventListener("click", handleUnfollow);
-        }
-        followBox.appendChild(button);
-    }
+
 
     async function loadCounts() {
-        console.log("loadCounts() 호출!");
-        const response1 = await fetch('/api/follow/[[${post.author.id}]]/followingCount',
-            {
-                // "method": "GET",
-                "headers": { "Content-Type": "application/json" }
-            }
-        )
-        const response2 = await fetch('/api/follow/[[${post.author.id}]]/followerCount',
-            {
-                // "method": "GET",
-                "headers": { "Content-Type": "application/json" }
-            }
-        )
-        // 해당 작성자가 팔로우한 수
-        const followingCount = document.querySelector("#followingCount");
-        followingCount.textContent = await response1.text(); // 숫자라서...
-        // follower <- 해당 작성자를 팔로우한 사람 수
-        const followerCount = document.querySelector("#followerCount");
-        followerCount.textContent = await response2.text(); // 숫자라서...
+        const [followingRes, followerRes] = await Promise.all([
+            fetch(`/api/follow/${authorId}/followingCount`),
+            fetch(`/api/follow/${authorId}/followerCount`)
+        ]);
+        document.getElementById("followingCount").textContent = await followingRes.text();
+        document.getElementById("followerCount").textContent = await followerRes.text();
     }
 
-    document.addEventListener("DOMContentLoaded", loadComments);
-    document.addEventListener("DOMContentLoaded", loadCounts);
+    async function handleFollow(follow) {
+        await fetch(`/api/follow/${authorId}`, { method: follow ? "POST" : "DELETE" });
+        location.reload();
+    }
+
+    const followButton = document.getElementById("followButton");
+    if(followButton) {
+        followButton.addEventListener("click", () => handleFollow(true));
+    }
+
+    const unfollowButton = document.getElementById("unfollowButton");
+    if(unfollowButton) {
+        unfollowButton.addEventListener("click", () => handleFollow(false));
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadComments();
+        if(document.getElementById("followingCount")){
+            loadCounts();
+        }
+    });
 </script>
 </body>
 </html>

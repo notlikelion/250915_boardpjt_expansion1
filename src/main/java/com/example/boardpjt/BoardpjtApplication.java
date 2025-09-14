@@ -22,20 +22,17 @@ public class BoardpjtApplication {
     ) {
         return args -> {
                 String adminUsername = "admin";
-                String adminPassword = "pass";
+                String adminPassword = "passpass";
                 ;
                 boolean adminExists = userAccountRepository.findByUsername(adminUsername).isPresent();
 
-                if (adminExists) {
-                    UserAccount oldAdmin = userAccountRepository.findByUsername(adminUsername).get();
-                    userAccountRepository.delete(oldAdmin);
+                if (!adminExists) {
+                    UserAccount admin = new UserAccount();
+                    admin.setUsername(adminUsername);
+                    admin.setPassword(passwordEncoder.encode(adminPassword));
+                    admin.setRole("ROLE_ADMIN");
+                    userAccountRepository.save(admin);
                 }
-
-                UserAccount admin = new UserAccount();
-                admin.setUsername(adminUsername);
-                admin.setPassword(passwordEncoder.encode(adminPassword));
-                admin.setRole("ROLE_ADMIN");
-                userAccountRepository.save(admin);
         };
     }
 }
